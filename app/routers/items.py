@@ -16,13 +16,12 @@ fake_items_db = {}
 item_id_counter = 1
 
 from fastapi import APIRouter
-from uuid import UUID
 from datetime import datetime
 
 router = APIRouter()
 
 @router.get("/get_investment_data_for_user")
-async def read_items(userID: UUID, fromID: datetime, toID: datetime):
+async def read_items(userID: str, fromID: datetime, toID: datetime):
     return {
         "title": "Tech",
         "percentage": 0.30,
@@ -32,5 +31,15 @@ async def read_items(userID: UUID, fromID: datetime, toID: datetime):
         ]
     }
 
+@router.get("/get_aggregated_investment_data")
+async def read_items(region: str, fromID: datetime, toID: datetime):
+    return {
+        "title": "Tech",
+        "percentage": 0.30,
+        "Elements": [
+            {"title": "Apple", "percentage": 0.05},
+            {"title": "Google", "percentage": 0.05}
+        ]
+    }
 
 
