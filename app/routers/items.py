@@ -20,8 +20,14 @@ from datetime import datetime
 
 router = APIRouter()
 
+#def read_csv
+
 @router.get("/get_investment_data_for_user")
-async def read_items(userID: str, fromID: datetime, toID: datetime):
+async def read_items(
+    userID: Optional[str] = str('123e4567-e89b-12d3-a456-426614174000'),
+    fromID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00'),
+    toID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00')
+):
     return {
         "title": "Tech",
         "percentage": 0.30,
@@ -32,7 +38,11 @@ async def read_items(userID: str, fromID: datetime, toID: datetime):
     }
 
 @router.get("/get_aggregated_investment_data")
-async def read_items(region: str, fromID: datetime, toID: datetime):
+async def read_items(
+    userID: Optional[str] = str('123e4567-e89b-12d3-a456-426614174000'),
+    fromID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00'),
+    toID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00')
+):
     return {
         "title": "Tech",
         "percentage": 0.30,
