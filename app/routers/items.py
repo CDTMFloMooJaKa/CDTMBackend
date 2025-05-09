@@ -2,6 +2,7 @@
 # app/routers/items.py
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
+from datetime import datetime
 from ..models.item import Item, ItemCreate, ItemUpdate
 
 router = APIRouter(
@@ -14,44 +15,22 @@ router = APIRouter(
 fake_items_db = {}
 item_id_counter = 1
 
-@router.post("/", response_model=Item, status_code=201)
-async def create_item(item: ItemCreate):
-    global item_id_counter
-    item_id = item_id_counter
-    item_id_counter += 1
-    item_dict = item.model_dump()
-    fake_items_db[item_id] = Item(id=item_id, **item_dict)
-    return fake_items_db[item_id]
+from fastapi import APIRouter
+from uuid import UUID
+from datetime import datetime
 
-@router.get("/", response_model=List[Item])
-async def read_items(skip: int = 0, limit: int = 10):
-    return list(fake_items_db.values())[skip : skip + limit]
+router = APIRouter()
 
-@router.get("/{item_id}", response_model=Item)
-async def read_item(item_id: int):
-    if item_id not in fake_items_db:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return fake_items_db[item_id]
+@router.get("/get_investment_data_for_user")
+async def read_items(userID: UUID, fromID: datetime, toID: datetime):
+    return {
+        "title": "Tech",
+        "percentage": 0.30,
+        "Elements": [
+            {"title": "Apple", "percentage": 0.05},
+            {"title": "Google", "percentage": 0.05}
+        ]
+    }
 
-@router.put("/{item_id}", response_model=Item)
-async def update_item(item_id: int, item: ItemUpdate):
-    if item_id not in fake_items_db:
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    stored_item = fake_items_db[item_id]
-    update_data = item.model_dump(exclude_unset=True)
-    
-    for field, value in update_data.items():
-        setattr(stored_item, field, value)
-    
-    fake_items_db[item_id] = stored_item
-    return stored_item
 
-@router.delete("/{item_id}", response_model=Item)
-async def delete_item(item_id: int):
-    if item_id not in fake_items_db:
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    item = fake_items_db[item_id]
-    del fake_items_db[item_id]
-    return item
+
