@@ -1,0 +1,37 @@
+// get_investment_data_for_user(userID, from_to?)
+
+[
+    {
+        "title": "Tech",
+        "percentage": 0.30,
+        "Elements": [
+            {
+                "title": "Apple",
+                "percentage": 0.05
+            },
+            {
+                "title": "Google",
+                "percentage": 0.05
+            }
+        ]
+    }
+]
+
+// get_aggregated_investment_data(region, from_to?) (Region is ENUM with {"Ger", "Uk", "World"})
+// Same Structure as get_investment_data_for_user
+[
+    {
+        "title": "Tech",
+        "percentage": 0.30,
+        "Elements": [
+            {
+                "title": "Apple",
+                "percentage": 0.05
+            },
+            {
+                "title": "Google",
+                "percentage": 0.05
+            }
+        ]
+    }
+]
