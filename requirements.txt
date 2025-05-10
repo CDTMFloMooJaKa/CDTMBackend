@@ -11,4 +11,5 @@ openai
 websockets
 asyncio
 pandas
+motor
 # No need for a separate watchfiles package as it's included in uvicorn[standard]

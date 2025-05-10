@@ -5,6 +5,7 @@ from typing import Optional
 from datetime import datetime
 import pandas as pd
 import logging
+from motor.motor_asyncio import AsyncIOMotorClient
 from scripts.trade_republic_api_wrapper import extract_info_from_isin
 from scripts.helpers import convert_df_to_json
 
@@ -63,20 +64,7 @@ def round_calc(df):
 
 @router.get("/load_top_investments")
 def load_top_investments(user = None, fromID = None, toID = None): # user: 016e4ff3-91b2-490f-9c1e-a09defe004b2
-    df = read_csv('data/trading_sample_data.csv')
-    df = filter_customer(df, user, fromID, toID)
-    df = add_volume(df)
-    
-    stock_data = pd.read_csv('data/isin_info.csv', usecols=['ISIN','sector','name','price_per_share','currency'])
-    
-    df = df.merge(stock_data, on = 'ISIN', how = 'left')
-    df = group_by_ISIN_volume(df)
-    df = df.pivot(index=['ISIN', 'sector', 'name'], columns='direction', values='Volume').reset_index()
-    df = df.dropna()
-    df = df.set_index('ISIN')
-    df = round_calc(df)
-    df = df.rename(columns={'BUY': 'BuyTotal', 'SELL': 'SellTotal', 'sector': 'Sector', 'name': 'Name'})
-    df = df.dropna()
+    df = open_db()
     return convert_df_to_json(df)
 
 
@@ -179,3 +167,28 @@ async def test_stock():
     stock_data = stock_data.reset_index(drop=True)
 
     return {"rows": stock_data.to_dict(orient="records")}
+
+# Mongo URI (from your example)
+MONGO_URI = "mongodb+srv://userCDTM:gmcIxYK0t6aWHYa5@cluster0.nr8w3o8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Global Mongo client
+client: AsyncIOMotorClient = None
+
+@app.on_event("startup")
+async def startup_db_client():
+    global client
+    client = AsyncIOMotorClient(MONGO_URI)
+    # Optional: test connection like "ping"
+    await client.admin.command("ping")
+    print("Connected to MongoDB!")
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    client.close()
+    print("MongoDB connection closed.")
+
+def open_db():
+    db = client["trading_sample_data"]
+    collection = db["CDTM"]
+    doc = collection.find_one()
+    return doc
