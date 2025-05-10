@@ -1,31 +1,38 @@
 import asyncio
 import json
 import pandas as pd
+import time
 import websockets
 
 
-async def subscribe(uri, id, type="instrument"):
-    async with websockets.connect(uri) as websocket:
-        print("Connecting to server...")
+async def subscribe(uri, id, type="instrument", timeout=5):
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            async with websockets.connect(uri) as websocket:
+                print("Connecting to server...")
 
-        await websocket.send("connect 30")
-        print("Sent: connect 30")
+                await websocket.send("connect 30")
+                print("Sent: connect 30")
 
-        while True:
-            response = await websocket.recv()
-            print("Received:", response)
+                while True:
+                    response = await websocket.recv()
+                    print("Received:", response)
 
-            if "connected" in response:
-                print("Connection confirmed! Proceeding...")
-                break
+                    if "connected" in response:
+                        print("Connection confirmed! Proceeding...")
+                        break
 
-        sub_message = json.dumps({"type": type, "id": id})
-        await websocket.send(f"sub 1 {sub_message}")
-        print(f"Sent subscription request: {sub_message}")
+                sub_message = json.dumps({"type": type, "id": id})
+                await websocket.send(f"sub 1 {sub_message}")
+                print(f"Sent subscription request: {sub_message}")
 
-        sub_response = await websocket.recv()
-        print("Subscription response received.")
-        return sub_response[sub_response.find("{"):]
+                sub_response = await websocket.recv()
+                print("Subscription response received.")
+                return sub_response[sub_response.find("{"):]
+        except Exception:
+            pass
+    raise Exception("Connection timed out.")
 
 
 def extract_info_from_isin(isin):
