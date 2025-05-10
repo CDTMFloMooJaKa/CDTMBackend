@@ -3,10 +3,12 @@ from mistral.mistral_api import get_mistral_response
 
 def convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total):
     df = df[df["Sector"] == sector]
-    print(df)
+    sector_df_buy_max_indices = df.sort_values(by='BuyPct', ascending=False).head(5).index
+    sector_df_sell_max_indices = df.sort_values(by='SellPct', ascending=False).head(5).index
+    indices = list(set(sector_df_buy_max_indices).union(sector_df_sell_max_indices))
     companies = []
 
-    for i in df.index:
+    for i in indices:
         company_dict = {
             "title": df.at[i, "Name"],
             "percentage_sold": float(df.at[i, "SellPct"]) / percentage_sold_total,
@@ -19,15 +21,15 @@ def convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_
 
 
 def convert_df_to_json(df):
-    category_counts = df["Sector"].value_counts()
-    threshold = 2
-    df["Sector"] = df["Sector"].apply(lambda x: x if category_counts[x] >= threshold else "Other")
-
     sector_df = df.groupby("Sector").sum().reset_index().drop("Name", axis=1)
+    sector_df_buy_max_indices = sector_df.sort_values(by='BuyPct', ascending=False).head(5).index
+    sector_df_sell_max_indices = sector_df.sort_values(by='SellPct', ascending=False).head(5).index
+    indices = list(set(sector_df_buy_max_indices).union(sector_df_sell_max_indices))
     sectors = []
 
-    for i in sector_df.index:
+    for i in indices:
         sector = sector_df.at[i, "Sector"]
+        #print("sector: ", sector)
         percentage_sold_total = round(sector_df.at[i, "SellPct"], 4)
         percentage_bought_total = round(sector_df.at[i, "BuyPct"], 4)
         sector_dict = {
@@ -38,13 +40,13 @@ def convert_df_to_json(df):
             "amount_sold": round(sector_df.at[i, "SellTotal"],4),
             "Elements": convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total)
         }
-        prompt = f"can you please write one short short sentence about the data here in a in a simple way {sector_dict}"
-        message = get_mistral_response(prompt)
-        sector_dict["message"] = message
+        #prompt = f"can you please write one short short sentence about the data here in a in a simple way {sector_dict}"
+       # message = get_mistral_response(prompt)
+        sector_dict["message"] = "message"
         sectors.append(sector_dict)
-    prompt = f"can you please write one short short sentence about the data here in a simple way about the most popular sector {sectors}"
-    message = get_mistral_response(prompt)
-    return {"sectors" : sectors, "message" : message}
+    #prompt = f"can you please write one short short sentence about the data here in a simple way about the most popular sector {sectors}"
+    #message = get_mistral_response(prompt)
+    return {"sectors" : sectors, "message" : "message"}
 
 
 if __name__ == "__main__":
