@@ -7,7 +7,8 @@ import pandas as pd
 import numpy as np
 import logging
 from ..models.item import Item, ItemCreate, ItemUpdate
-from scripts.trade_republic_api_wrapper import *
+from scripts.trade_republic_api_wrapper import extract_info_from_isin
+from scripts.helpers import convert_df_to_json
 
 router = APIRouter(
     prefix="/items",
@@ -33,21 +34,17 @@ def filter_customer(df, user = None, fromID = None, toID = None):
     Filter df
     '''
     if user != None:
-        df[df['userId'] == user]
+        df = df[df['userId'] == user]
     if fromID != None:
-        df[df['executedAt'] >= fromID]
+        df = df[df['executedAt'] >= fromID]
     if toID != None:
-        df[df['executedAt'] <= toID]
+        df = df[df['executedAt'] <= toID]
     return df
 
 def add_volume(df):
     '''
     Add field volume, account for SELL.
     '''
-    df['executionPrice'] = np.where(df['direction'] == 'SELL', 
-                                    -df['executionPrice'], 
-                                    df['executionPrice'])
-
     df['Volume'] = df['executionPrice'] * df['executionSize']
     return df
 
@@ -55,58 +52,40 @@ def group_by_ISIN_volume(df):
     '''
     Group df volume and sort values ascending.
     '''
-    return df.groupby(['ISIN','sector','name','direction']).sum()
+    df = df.groupby(['ISIN','sector','name','direction'])['Volume'].sum()
+    df = df.reset_index()
+    return df
 
 @router.get("/load_top_investments")
-def load_top_investments(user = None, fromID = None, toID = None):
-    df = read_csv('../../data/trading_sample_data.csv').head()
+def load_top_investments(user = '016e4ff3-91b2-490f-9c1e-a09defe004b2', fromID = None, toID = None):
+    df = read_csv('data/trading_sample_data.csv')
     df = filter_customer(df, user, fromID, toID)
-    #df = add_volume(df)
-    '''
+    df = add_volume(df)
+    
     stock_data = pd.DataFrame()
     for i in df['ISIN']:
         try:
-            stock_data = pd.concat([stock_data, pd.DataFrame([extract_info_from_isin(i)])], axis = 1)
+            stock_data = pd.concat([stock_data, pd.DataFrame([extract_info_from_isin(i)])], axis = 0)
         except:
             logging.warning('API could not fetch ISIN data')
-    '''
-    data = [
-        {
-            'ISIN': 'CNE100000296',
-            'name': 'Alibaba Group Holding Ltd.',
-            'sector': 'E-Commerce',
-            'direction': 'BUY'
-        },
-        {
-            'ISIN': 'US29786A1060',
-            'name': 'eBay Inc.',
-            'sector': 'Online Retail',
-            'direction': 'SELL'
-        },
-        {
-            'ISIN': 'US64110L1061',
-            'name': 'Netflix Inc.',
-            'sector': 'Internet & Software',
-            'direction': 'BUY'
-        },
-        {
-            'ISIN': 'IE000XZSV718',
-            'name': 'iShares MSCI World ETF',
-            'sector': 'ETF',
-            'direction': 'BUY'
-        }
-    ]
-
-    stock_data = pd.DataFrame(data)
+    
     df = df.merge(stock_data, on = 'ISIN')
     df = group_by_ISIN_volume(df)
-    df['share'] = df['your_column'] / df['your_column'].sum()
-    return df
+    df = df.pivot(index=['ISIN', 'sector', 'name'], columns='direction', values='Volume').reset_index()
+    df = df.dropna()
+    df = df.set_index('ISIN')
+    df['BUY'] = round(df['BUY'], 2)
+    df['SELL'] = round(df['SELL'], 2)                   
+    df['BuyPct'] = round(df['BUY'] / df['BUY'].sum(), 2)
+    df['SellPct'] = round(df['SELL'] / df['SELL'].sum(), 2)
+    df = df.rename(columns={'BUY': 'BuyTotal', 'SELL': 'SellTotal', 'sector': 'Sector', 'name': 'Name'})
+    print(df)
+    return convert_df_to_json(df)
 
 
 @router.get("/get_investment_data_for_user")
 async def read_investment_data_user(
-    userID: Optional[str] = str('00909ba7-ad01-42f1-9074-2773c7d3cf2c'),
+    userID: Optional[str] = str('016e4ff3-91b2-490f-9c1e-a09defe004b2'),
     fromID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00'),
     toID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00')
 ):
@@ -149,7 +128,7 @@ async def read_investment_data_user(
 
 @router.get("/get_aggregated_investment_data")
 async def read_investment_data(
-    userID: Optional[str] = str('00909ba7-ad01-42f1-9074-2773c7d3cf2c'),
+    userID: Optional[str] = str('016e4ff3-91b2-490f-9c1e-a09defe004b2'),
     fromID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00'),
     toID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00')
 ):
