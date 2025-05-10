@@ -3,15 +3,20 @@
 [
     {
         "title": "Tech",
-        "percentage": 0.30,
         "Elements": [
             {
                 "title": "Apple",
-                "percentage": 0.05
+                "percentage_sold": 0.30,
+                "percentage_bought": 0.25,
+                "amount_bought": 563,
+                "amount_sold": 566
             },
             {
                 "title": "Google",
-                "percentage": 0.05
+                "percentage_sold": 0.30,
+                "percentage_bought": 0.25,
+                "amount_bought": 563,
+                "amount_sold": 566
             }
         ]
     }
@@ -22,15 +27,18 @@
 [
     {
         "title": "Tech",
-        "percentage": 0.30,
+        "percentage_sold": 0.30,
+        "percentage_bought": 0.25,
         "Elements": [
             {
                 "title": "Apple",
-                "percentage": 0.05
+                "percentage_sold": 0.05,
+                "percentage_bought": 0.6
             },
             {
                 "title": "Google",
-                "percentage": 0.05
+                "percentage": 0.05,
+                "percentage_bought": 0.6
             }
         ]
     }
