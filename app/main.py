@@ -13,10 +13,10 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["https://trade-republic-replica-ui.vercel.app/"],  # Adjust your frontend URL
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Allow these methods
+    allow_headers=["*"],  # Allow all headers (or specify specific headers)
 )
 
 # Include routers
