@@ -56,16 +56,6 @@ def group_by_ISIN_volume(df):
     df = df.reset_index()
     return df
 
-def create_shares_sum(df):
-    '''
-    This calculats the share and rounds everything to two comma.
-    '''
-    df['BUY'] = round(df['BUY'], 2)
-    df['SELL'] = round(df['SELL'], 2)                   
-    df['BuyPct'] = round(df['BUY'] / df['BUY'].sum(), 2)
-    df['SellPct'] = round(df['SELL'] / df['SELL'].sum(), 2)
-    return df
-
 @router.get("/load_top_investments")
 def load_top_investments(user = '016e4ff3-91b2-490f-9c1e-a09defe004b2', fromID = None, toID = None):
     df = read_csv('data/trading_sample_data.csv')
@@ -84,7 +74,10 @@ def load_top_investments(user = '016e4ff3-91b2-490f-9c1e-a09defe004b2', fromID =
     df = df.pivot(index=['ISIN', 'sector', 'name'], columns='direction', values='Volume').reset_index()
     df = df.dropna()
     df = df.set_index('ISIN')
-    df = create_shares_sum(df)
+    df['BUY'] = round(df['BUY'], 2)
+    df['SELL'] = round(df['SELL'], 2)                   
+    df['BuyPct'] = round(df['BUY'] / df['BUY'].sum(), 2)
+    df['SellPct'] = round(df['SELL'] / df['SELL'].sum(), 2)
     df = df.rename(columns={'BUY': 'BuyTotal', 'SELL': 'SellTotal', 'sector': 'Sector', 'name': 'Name'})
     print(df)
     return convert_df_to_json(df)
