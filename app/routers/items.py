@@ -1,12 +1,10 @@
 
 # app/routers/items.py
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Optional
+from fastapi import APIRouter
+from typing import Optional
 from datetime import datetime
 import pandas as pd
-import numpy as np
 import logging
-from ..models.item import Item, ItemCreate, ItemUpdate
 from scripts.trade_republic_api_wrapper import extract_info_from_isin
 from scripts.helpers import convert_df_to_json
 
