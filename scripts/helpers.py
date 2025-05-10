@@ -38,8 +38,11 @@ def convert_df_to_json(df):
             "amount_sold": round(sector_df.at[i, "SellTotal"],4),
             "Elements": convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total)
         }
+        prompt = f"can you please write one short short sentence about the data here in a in a simple way {sector_dict}"
+        message = get_mistral_response(prompt)
+        sectors_dict["message"] = message
         sectors.append(sector_dict)
-    prompt = f"can you please write one short short sentence about the data here in a funny way about the most popular sector {sectors}"
+    prompt = f"can you please write one short short sentence about the data here in a simple way about the most popular sector {sectors}"
     message = get_mistral_response(prompt)
     return {"sectors" : sectors, "message" : message}
 
