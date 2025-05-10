@@ -30,10 +30,10 @@ def convert_df_to_json(df):
         sector = sector_df.at[i, "Sector"]
         sector_dict = {
             "title": sector,
-            "percentage_sold": sector_df.at[i, "SellPct"],
-            "percentage_bought": sector_df.at[i, "BuyPct"],
-            "amount_bought": sector_df.at[i, "BuyTotal"],
-            "amount_sold": sector_df.at[i, "SellTotal"],
+            "percentage_sold": round(sector_df.at[i, "SellPct"], 2),
+            "percentage_bought":  round(sector_df.at[i, "BuyPct"], 2),
+            "amount_bought":  round(sector_df.at[i, "BuyTotal"],2),
+            "amount_sold": round(sector_df.at[i, "SellTotal"],2),
             "Elements": convert_df_to_json_for_sector(df, sector)
         }
         sectors.append(sector_dict)
