@@ -33,7 +33,7 @@ def convert_df_to_json(df):
             "Elements": convert_df_to_json_for_sector(df, sector)
         }
         sectors.append(sector_dict)
-    print(sectors)
+    return sectors
 
 
 if __name__ == "__main__":
