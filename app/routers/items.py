@@ -28,14 +28,41 @@ async def read_items(
     fromID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00'),
     toID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00')
 ):
-    return {
-        "title": "Tech",
-        "percentage": 0.30,
-        "Elements": [
-            {"title": "Apple", "percentage": 0.05},
-            {"title": "Google", "percentage": 0.05}
+    return [
+            {
+                "title": "Tech",
+                "percentage": 0.70,
+                "Elements": [
+                    {
+                        "title": "Apple",
+                        "percentage": 0.5
+                    },
+                    {
+                        "title": "Google",
+                        "percentage": 0.5
+                    }
+                ]
+            },
+            {
+                "title": "Health",
+                "percentage": 0.30,
+                "Elements": [
+                    {
+                        "title": "Siemens",
+                        "percentage": 0.30
+                    },
+                    {
+                        "title": "MedTech",
+                        "percentage": 0.25
+                    },
+                    {
+                        "title": "GSK",
+                        "percentage": 0.45
+                    }
+                ]
+            }
         ]
-    }
+    
 
 @router.get("/get_aggregated_investment_data")
 async def read_items(
@@ -43,13 +70,39 @@ async def read_items(
     fromID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00'),
     toID: Optional[datetime] = datetime.fromisoformat('2025-01-01T00:00:00')
 ):
-    return {
-        "title": "Tech",
-        "percentage": 0.30,
-        "Elements": [
-            {"title": "Apple", "percentage": 0.05},
-            {"title": "Google", "percentage": 0.05}
+    return [
+            {
+                "title": "Tech",
+                "percentage": 0.70,
+                "Elements": [
+                    {
+                        "title": "Apple",
+                        "percentage": 0.5
+                    },
+                    {
+                        "title": "Google",
+                        "percentage": 0.5
+                    }
+                ]
+            },
+            {
+                "title": "Health",
+                "percentage": 0.30,
+                "Elements": [
+                    {
+                        "title": "Siemens",
+                        "percentage": 0.30
+                    },
+                    {
+                        "title": "MedTech",
+                        "percentage": 0.25
+                    },
+                    {
+                        "title": "GSK",
+                        "percentage": 0.45
+                    }
+                ]
+            }
         ]
-    }
 
 
