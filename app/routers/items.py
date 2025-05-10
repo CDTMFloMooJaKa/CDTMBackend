@@ -56,30 +56,30 @@ def group_by_ISIN_volume(df):
     df = df.reset_index()
     return df
 
+def round_calc(df):
+    df['BUY'] = round(df['BUY'], 2)
+    df['SELL'] = round(df['SELL'], 2)      
+    df['BuyPct'] = round(df['BUY'] / df['BUY'].sum(), 4)
+    df['SellPct'] = round(df['SELL'] / df['SELL'].sum(), 4)
+    return df
+
 @router.get("/load_top_investments")
-def load_top_investments(user = '016e4ff3-91b2-490f-9c1e-a09defe004b2', fromID = None, toID = None):
+def load_top_investments(user = None, fromID = None, toID = None): # user: 016e4ff3-91b2-490f-9c1e-a09defe004b2
     df = read_csv('data/trading_sample_data.csv')
     df = filter_customer(df, user, fromID, toID)
     df = add_volume(df)
     
-    stock_data = pd.DataFrame()
-    for i in df['ISIN']:
-        try:
-            stock_data = pd.concat([stock_data, pd.DataFrame([extract_info_from_isin(i)])], axis = 0)
-        except:
-            logging.warning('API could not fetch ISIN data')
+    stock_data = pd.read_csv('data/isin_info.csv', usecols=['ISIN','sector','name','price_per_share','currency'])
     
-    df = df.merge(stock_data, on = 'ISIN')
+    df = df.merge(stock_data, on = 'ISIN', how = 'left')
     df = group_by_ISIN_volume(df)
     df = df.pivot(index=['ISIN', 'sector', 'name'], columns='direction', values='Volume').reset_index()
     df = df.dropna()
     df = df.set_index('ISIN')
-    df['BUY'] = round(df['BUY'], 2)
-    df['SELL'] = round(df['SELL'], 2)                   
-    df['BuyPct'] = round(df['BUY'] / df['BUY'].sum(), 2)
-    df['SellPct'] = round(df['SELL'] / df['SELL'].sum(), 2)
+    df = round_calc(df)
     df = df.rename(columns={'BUY': 'BuyTotal', 'SELL': 'SellTotal', 'sector': 'Sector', 'name': 'Name'})
-    print(df)
+    df = df.dropna()
+    print(df.head())
     return convert_df_to_json(df)
 
 
@@ -169,7 +169,7 @@ async def read_investment_data(
 
 @router.get("/test_stock")
 async def test_stock():
-    df = read_csv('data/trading_sample_data.csv').head()
+    df = read_csv('data/trading_sample_data.csv')
     stock_data = pd.DataFrame()
 
     for i in df['ISIN']:
