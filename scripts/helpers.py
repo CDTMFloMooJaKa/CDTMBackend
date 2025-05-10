@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def convert_df_to_json_for_sector(df, sector):
+def convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total):
     df = df[df["Sector"] == sector]
     print(df)
     companies = []
@@ -9,8 +9,8 @@ def convert_df_to_json_for_sector(df, sector):
     for i in df.index:
         company_dict = {
             "title": df.at[i, "Name"],
-            "percentage_sold": float(df.at[i, "SellPct"]),
-            "percentage_bought": float(df.at[i, "BuyPct"]),
+            "percentage_sold": float(df.at[i, "SellPct"]) / percentage_sold_total,
+            "percentage_bought": float(df.at[i, "BuyPct"]) /percentage_bought_total,
             "amount_bought": float(df.at[i, "BuyTotal"]),
             "amount_sold": float(df.at[i, "SellTotal"])
         }
@@ -28,13 +28,15 @@ def convert_df_to_json(df):
 
     for i in sector_df.index:
         sector = sector_df.at[i, "Sector"]
+        percentage_sold_total = round(sector_df.at[i, "SellPct"], 2)
+        percentage_bought_total = round(sector_df.at[i, "BuyPct"], 2)
         sector_dict = {
             "title": sector,
-            "percentage_sold": round(sector_df.at[i, "SellPct"], 2),
-            "percentage_bought":  round(sector_df.at[i, "BuyPct"], 2),
+            "percentage_sold": percentage_sold_total,
+            "percentage_bought":  percentage_bought_total,
             "amount_bought":  round(sector_df.at[i, "BuyTotal"],2),
             "amount_sold": round(sector_df.at[i, "SellTotal"],2),
-            "Elements": convert_df_to_json_for_sector(df, sector)
+            "Elements": convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total)
         }
         sectors.append(sector_dict)
     return sectors
