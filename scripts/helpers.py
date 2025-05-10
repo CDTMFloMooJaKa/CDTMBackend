@@ -8,7 +8,7 @@ def convert_df_to_json_for_sector(df, sector, percentage, action):
     for i in indices:
         company_dict = {
             "name": df.at[i, "Name"],
-            "percentage": float(df.at[i, f"{action}Pct"]) / percentage
+            "percentage": f"{int(float(df.at[i, f"{action}Pct"]) / percentage*100)}%",
         }
         companies.append(company_dict)
     return companies
@@ -29,7 +29,7 @@ def convert_type_df_to_json(df, action="Buy"):
         percentage = round(sector_df.at[i, f"{action}Pct"], 4)
         sector_dict = {
             "name":  sector,
-            "percentage": percentage,
+            "percentage": f"{int(percentage*100)}%",
             "subcategories": convert_df_to_json_for_sector(df, sector, percentage, action)
         }
         sectors.append(sector_dict)
