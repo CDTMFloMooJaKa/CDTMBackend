@@ -4,7 +4,7 @@ import openai
 def get_mistral_response(prompt):
 
     client = openai.OpenAI(
-        api_key="V7idLASik2Ku8GRQHU1SWjzi0vU9lV10",
+        api_key=os.environ['mistral_api_token'],
         base_url="https://api.mistral.ai/v1"  # <- required!
     )
     response = client.chat.completions.create(
