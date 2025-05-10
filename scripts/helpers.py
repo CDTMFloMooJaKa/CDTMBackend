@@ -1,5 +1,5 @@
 import pandas as pd
-
+from mistral.mistral_api import get_mistral_response
 
 def convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total):
     df = df[df["Sector"] == sector]
@@ -28,18 +28,20 @@ def convert_df_to_json(df):
 
     for i in sector_df.index:
         sector = sector_df.at[i, "Sector"]
-        percentage_sold_total = round(sector_df.at[i, "SellPct"], 2)
-        percentage_bought_total = round(sector_df.at[i, "BuyPct"], 2)
+        percentage_sold_total = round(sector_df.at[i, "SellPct"], 4)
+        percentage_bought_total = round(sector_df.at[i, "BuyPct"], 4)
         sector_dict = {
             "title": sector,
             "percentage_sold": percentage_sold_total,
             "percentage_bought":  percentage_bought_total,
-            "amount_bought":  round(sector_df.at[i, "BuyTotal"],2),
-            "amount_sold": round(sector_df.at[i, "SellTotal"],2),
+            "amount_bought":  round(sector_df.at[i, "BuyTotal"],4),
+            "amount_sold": round(sector_df.at[i, "SellTotal"],4),
             "Elements": convert_df_to_json_for_sector(df, sector, percentage_sold_total, percentage_bought_total)
         }
         sectors.append(sector_dict)
-    return sectors
+    prompt = f"can you please write one short short sentence about the data here in a funny way about the most popular sector {sectors}"
+    message = get_mistral_response(prompt)
+    return {"sectors" : sectors, "message" : message}
 
 
 if __name__ == "__main__":

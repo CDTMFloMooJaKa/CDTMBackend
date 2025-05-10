@@ -79,7 +79,6 @@ def load_top_investments(user = None, fromID = None, toID = None): # user: 016e4
     df = round_calc(df)
     df = df.rename(columns={'BUY': 'BuyTotal', 'SELL': 'SellTotal', 'sector': 'Sector', 'name': 'Name'})
     df = df.dropna()
-    print(df.head())
     return convert_df_to_json(df)
 
 
@@ -175,12 +174,10 @@ async def test_stock():
     for i in df['ISIN']:
         try:
             result = extract_info_from_isin(i)  # ✅ await the async function
-            print(result)
             stock_data = pd.concat([stock_data, pd.DataFrame([result])], axis=0)
         except Exception as e:
             logging.warning(f'API could not fetch ISIN data for {i}: {e}')
 
     stock_data = stock_data.reset_index(drop=True)
-    print(stock_data)
 
     return {"rows": stock_data.to_dict(orient="records")}
