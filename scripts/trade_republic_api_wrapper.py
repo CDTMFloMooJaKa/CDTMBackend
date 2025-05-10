@@ -4,7 +4,7 @@ import pandas as pd
 import websockets
 
 
-async def subscribe(uri, isin):
+async def subscribe(uri, id, type="instrument"):
     async with websockets.connect(uri) as websocket:
         print("Connecting to server...")
 
@@ -19,7 +19,7 @@ async def subscribe(uri, isin):
                 print("Connection confirmed! Proceeding...")
                 break
 
-        sub_message = json.dumps({"type": "instrument", "id": isin})
+        sub_message = json.dumps({"type": type, "id": id})
         await websocket.send(f"sub 1 {sub_message}")
         print(f"Sent subscription request: {sub_message}")
 
@@ -30,12 +30,23 @@ async def subscribe(uri, isin):
 
 def extract_info_from_isin(isin):
     data = json.loads(asyncio.run(subscribe("wss://api.traderepublic.com", isin)))
+    exchange_id = data["exchanges"][0]["slug"]
+    id = f"{isin}.{exchange_id}"
+    price_info = json.loads(asyncio.run(subscribe("wss://api.traderepublic.com", id, type="ticker")))
+
+    try:
+        sector = data["tags"][0]["name"]
+    except Exception:
+        sector = None
     info = {
-        "sector": data["tags"][0]["name"],
-        "name": data["exchanges"][0]["nameAtExchange"]
+        "ISIN": isin,
+        "sector": sector,
+        "name": data["name"],
+        "price_per_share": price_info["bid"]["price"],
+        "currency": "EUR"
     }
     return info
 
 
 if __name__ == "__main__":
-    print(extract_info_from_isin("US8334451098"))
+    extract_info_from_isin("US67066G1040")
