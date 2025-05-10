@@ -31,7 +31,7 @@ async def subscribe(uri, id, type="instrument", timeout=5):
                 print("Subscription response received.")
                 return sub_response[sub_response.find("{"):]
         except Exception:
-            pass
+            time.sleep(0.5)
     raise Exception("Connection timed out.")
 
 
