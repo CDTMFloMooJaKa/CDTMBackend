@@ -55,25 +55,53 @@ def group_by_ISIN_volume(df):
     '''
     Group df volume and sort values ascending.
     '''
-    return df.groupby(['ISIN','sector', 'direction']).sum()
+    return df.groupby(['ISIN','sector','name','direction']).sum()
 
-def load_top_investments(filepath, user = None, fromID = None, toID = None):
-
-    df = read_csv('../../data/trading_sample_data.csv')
+@router.get("/load_top_investments")
+def load_top_investments(user = None, fromID = None, toID = None):
+    df = read_csv('../../data/trading_sample_data.csv').head()
     df = filter_customer(df, user, fromID, toID)
     #df = add_volume(df)
-
+    '''
     stock_data = pd.DataFrame()
     for i in df['ISIN']:
         try:
             stock_data = pd.concat([stock_data, pd.DataFrame([extract_info_from_isin(i)])], axis = 1)
         except:
             logging.warning('API could not fetch ISIN data')
+    '''
+    data = [
+        {
+            'ISIN': 'CNE100000296',
+            'name': 'Alibaba Group Holding Ltd.',
+            'sector': 'E-Commerce',
+            'direction': 'BUY'
+        },
+        {
+            'ISIN': 'US29786A1060',
+            'name': 'eBay Inc.',
+            'sector': 'Online Retail',
+            'direction': 'SELL'
+        },
+        {
+            'ISIN': 'US64110L1061',
+            'name': 'Netflix Inc.',
+            'sector': 'Internet & Software',
+            'direction': 'BUY'
+        },
+        {
+            'ISIN': 'IE000XZSV718',
+            'name': 'iShares MSCI World ETF',
+            'sector': 'ETF',
+            'direction': 'BUY'
+        }
+    ]
 
+    stock_data = pd.DataFrame(data)
     df = df.merge(stock_data, on = 'ISIN')
     df = group_by_ISIN_volume(df)
     df['share'] = df['your_column'] / df['your_column'].sum()
-
+    return df
 
 
 @router.get("/get_investment_data_for_user")
@@ -161,22 +189,19 @@ async def read_investment_data(
         ]
 
 @router.get("/test_stock")
-async def test_stock(
-):
-    df = read_csv('data/trading_sample_data.csv')
+async def test_stock():
+    df = read_csv('data/trading_sample_data.csv').head()
     stock_data = pd.DataFrame()
 
     for i in df['ISIN']:
         try:
-            result = await extract_info_from_isin(i)  
+            result = extract_info_from_isin(i)  # ✅ await the async function
             print(result)
             stock_data = pd.concat([stock_data, pd.DataFrame([result])], axis=0)
         except Exception as e:
             logging.warning(f'API could not fetch ISIN data for {i}: {e}')
 
-    stock_data = stock_data.T  # Transpose if needed
+    stock_data = stock_data.reset_index(drop=True)
     print(stock_data)
 
     return {"rows": stock_data.to_dict(orient="records")}
-
-
