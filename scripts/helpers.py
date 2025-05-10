@@ -40,7 +40,7 @@ def convert_df_to_json(df):
         }
         prompt = f"can you please write one short short sentence about the data here in a in a simple way {sector_dict}"
         message = get_mistral_response(prompt)
-        sectors_dict["message"] = message
+        sector_dict["message"] = message
         sectors.append(sector_dict)
     prompt = f"can you please write one short short sentence about the data here in a simple way about the most popular sector {sectors}"
     message = get_mistral_response(prompt)
