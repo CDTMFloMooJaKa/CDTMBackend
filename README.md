@@ -1,6 +1,6 @@
 # SwipeRepublic - FastAPI Backend
 
-![SwipeRepublic Logo](https://via.placeholder.com/800x200?text=SwipeRepublic)
+![SwipeRepublic Logo](pictures/SwipeRepublic.png)
 
 > Just a swipe away from investing in you
 
