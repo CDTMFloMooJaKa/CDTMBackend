@@ -1,6 +1,6 @@
 # SwipeRepublic - FastAPI Backend
 
-![SwipeRepublic Logo](.pictures/SwipeRepublic.png)
+<img src="pictures/SwipeRepublic.png" alt="SwipeRepublic Logo" width="200"/>
 
 > Just a swipe away from investing in you
 
@@ -128,6 +128,10 @@ DEBUG=True
 ## 🌟 Team
 
 **Team LMUnicorns - CDTM HACK 2025**
+<p align="left">
+  <img src="pictures/LMUUnicornsLogo.png" alt="LMUnicorns Logo" width="200"/>
+</p>
+
 - Florian Korn
 - Joseph Zgawlik
 - Kai Ponel
