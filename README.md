@@ -1,6 +1,6 @@
+# Swipe Republic Backend
 
-
-##Quick Start
+## Quick Start
 
 ### Option 1: Using Python (requires Python 3.8+)
 
